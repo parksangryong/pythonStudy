@@ -13,7 +13,11 @@ class Memo:
 
     def read_memo(self):
         with open(self.memo_name + '.txt', 'r') as f:
-            print(f.read())
+            content = f.read()
+            if content == '':
+                print("메모가 없습니다.")
+            else:
+                print(content)
 
 memo_name = input("메모 파일 이름을 입력하세요: ")
 memo = Memo(memo_name)
