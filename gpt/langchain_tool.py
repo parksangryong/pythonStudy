@@ -25,19 +25,31 @@ messages.append(HumanMessage(content="테슬라는 한달 전에 비해 주가�
 
 response = llm_with_tools.invoke(messages)
 
+# AI의 tool_calls 메시지를 먼저 추가
+messages.append(response)
+
+# 도구 실행 결과를 ToolMessage로 생성하여 추가
 for tool_call in response.tool_calls:
     selected_tool = tool_dict[tool_call["name"]]
-    tool_msg = selected_tool.invoke(tool_call)
-    messages.append(tool_msg)
+    result = selected_tool.invoke(tool_call["args"])
+    
+    # ToolMessage 생성 (tool_call_id 필수)
+    from langchain_core.messages import ToolMessage
+    tool_message = ToolMessage(
+        content=result,
+        tool_call_id=tool_call["id"]
+    )
+    messages.append(tool_message)
 
-# 마지막 메시지(도구 실행 결과)만 출력
-print("=== 도구 실행 결과 ===")
-print(messages[-1].content)
-
-# 또는 전체 대화를 깔끔하게 보려면
+# 전체 대화 출력
 print("\n=== 전체 대화 ===")
 for i, msg in enumerate(messages):
     if hasattr(msg, 'content'):
         print(f"{i+1}. {type(msg).__name__}: {msg.content}")
     else:
         print(f"{i+1}. {type(msg).__name__}: {msg}")
+
+# AI가 최종 답변 생성
+final_response = llm_with_tools.invoke(messages)
+print("\n=== AI 최종 답변 ===")
+print(final_response.content)
