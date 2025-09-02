@@ -2,6 +2,7 @@ from langchain_core.tools import tool
 from datetime import datetime
 import pytz
 import yfinance as yf
+from . import tools_pydantic 
 
 
 @tool
@@ -22,42 +23,32 @@ def get_current_time(tz: str , location: str ) -> str:
 
 @tool
 # 종목 정보 가져오기 함수
-def get_yf_stock_info(ticker: str) -> str:
+def get_yf_stock_info(stock_info_input: tools_pydantic.StockInfoInput) -> str:
     """
-    종목 정보를 가져오는 함수
-
-    Args:
-        ticker(str): 종목 코드(예: AAPL)
+    주식 종목의 정보를 조회하는 함수
     """
-    stock = yf.Ticker(ticker)
+    stock = yf.Ticker(stock_info_input.ticker)
     info = stock.info
     return str(info)
 
 @tool
 # 최근 주가 기록 
-def get_yf_stock_history(ticker: str, period: str) -> str:
+def get_yf_stock_history(stock_history_input: tools_pydantic.StockHistoryInput) -> str:
     """
-    최근 주가 기록을 가져오는 함수
-
-    Args:
-        ticker(str): 종목 코드(예: AAPL)
-        period(str): 기간(예: 1d, 5d, 1mo, 3mo, 6mo, 1y, 2y, 5y, 10y ... 등)
+    주식 종목의 일정 기간의 정보를 조회하는 함수
     """
-    stock = yf.Ticker(ticker)
-    history = stock.history(period = period)
+    stock = yf.Ticker(stock_history_input.ticker)
+    history = stock.history(period = stock_history_input.period)
     history_md = history.to_markdown() # 데이터 프레임을 마크다운으로 변환
     return history_md
 		
 @tool
 # 추천 정보
-def get_yf_stock_recommendations(ticker: str) -> str:
+def get_yf_stock_recommendations(stock_recommendations_input: tools_pydantic.StockRecommendationsInput) -> str:
     """
-    추천 정보를 가져오는 함수
-
-    Args:
-        ticker(str): 종목 코드(예: AAPL)
+    주식 종목의 추천 정보를 조회하는 함수
     """
-    stock = yf.Ticker(ticker)
+    stock = yf.Ticker(stock_recommendations_input.ticker)
     recommendations = stock.recommendations
     recommendations_md = recommendations.to_markdown()
     return str(recommendations_md)
