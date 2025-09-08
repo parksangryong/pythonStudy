@@ -23,13 +23,25 @@ messages = [
 
 messages.append(HumanMessage(content="테슬라는 한달 전에 비해 주가가 얼마나 올랐거나 내렸어?"))
 
-response = llm_with_tools.invoke(messages)
+response = llm_with_tools.stream(messages)
+
+is_first = True
+
+for chunk in response:
+    print("chunk type: ", type(chunk))
+    if is_first:
+        is_first = False
+        gathered = chunk
+    else:
+        gathered += chunk
+
+    print("content: ", gathered.content, "tool_call_chunk", gathered.tool_calls)
 
 # AI의 tool_calls 메시지를 먼저 추가
-messages.append(response)
+messages.append(gathered)
 
 # 도구 실행 결과를 ToolMessage로 생성하여 추가
-for tool_call in response.tool_calls:
+for tool_call in gathered.tool_calls:
     selected_tool = tool_dict[tool_call["name"]]
     result = selected_tool.invoke(tool_call["args"])
     
