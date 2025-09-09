@@ -1,6 +1,5 @@
 from langchain_ollama import ChatOllama
 from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
-import re
 
 llm = ChatOllama(model="deepseek-r1:7b")
 
@@ -16,9 +15,16 @@ while True:
         break
 
     messages.append(HumanMessage(content=user_input))
-    response = llm.invoke(messages)
+    response = llm.stream(messages)
     
-    answer = response.content
+    ai_message = None
+    for chunk in response:
+        print(chunk.content, end="")
+        if ai_message is None:
+            ai_message = chunk
+        else:
+            ai_message += chunk
+    print("")
     
-    print("Bot\t: ", answer)
-    messages.append(AIMessage(content=response.content))
+    message_only = ai_message.content.split("</think>")[1].strip()
+    messages.append(AIMessage(content=message_only))
