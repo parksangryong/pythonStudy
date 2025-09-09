@@ -1,3 +1,7 @@
+# https://urban.seoul.go.kr/view/html/PMNU5020400001?booksType=BK0300
+# https://a860-gpp.nyc.gov/concern/parent/gx41mm584/file_sets/1z40kw69m
+
+
 from langchain_community.document_loaders import PyPDFLoader # PDF 파일 읽는 라이브러리
 from langchain_text_splitters import RecursiveCharacterTextSplitter # 텍스트 쪼개는 라이브러리
 
