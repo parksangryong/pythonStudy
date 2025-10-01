@@ -1,6 +1,7 @@
 from langchain_ollama import ChatOllama
 from langchain_core.prompts import PromptTemplate
 from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
+from langchain_core.output_parsers import StrOutputParser
 
 llm = ChatOllama(model="llama3.2:1b")
 
@@ -27,6 +28,10 @@ message_list = [
 ASK = prompt_template.invoke({"country": "USA"}).text
 message_list.append(HumanMessage(content=ASK))
 
+# 출력 파서 생성
+output_parser = StrOutputParser()
+
 # 메시지 리스트를 LLM에 전달
 result = llm.invoke(message_list)
-print("결과:", result.content)
+output = output_parser.invoke(result)
+print(output)
